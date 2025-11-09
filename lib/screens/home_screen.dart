@@ -2,30 +2,22 @@ import 'package:flutter/material.dart';
 import '../utils/token_helper.dart';
 import '../api/api_service.dart';
 import 'login_screen.dart';
-import 'dart:convert';
 
 class HomeScreen extends StatelessWidget {
    HomeScreen({super.key});
 
   Future<void> logout(BuildContext context) async {
-    final refreshToken = await TokenHelper.getRefreshToken();
-    if (refreshToken != null) {
+    final refresh = await TokenHelper.getRefreshToken();
+    if (refresh != null) {
       try {
-        final res = await ApiService.logout(refreshToken);
-        final data = jsonDecode(res.body);
-        final msg = data['message'] ?? data['error'] ?? 'Logged out';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+        final res = await ApiService.logout(refresh);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message ?? res.error ?? 'Logged out')));
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: \$e')));
       }
     }
     await TokenHelper.clearTokens();
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) =>  LoginScreen()),
-      (route) => false,
-    );
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) =>  LoginScreen()), (r) => false);
   }
 
   @override
@@ -37,7 +29,7 @@ class HomeScreen extends StatelessWidget {
           IconButton(icon:  Icon(Icons.logout), onPressed: () => logout(context)),
         ],
       ),
-      body:  Center(child: Text('Welcome to the Job Portal! 🎉')),
+      body:  Center(child: Text('Welcome to Job Portal!')),
     );
   }
 }
