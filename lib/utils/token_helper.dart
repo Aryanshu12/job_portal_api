@@ -18,29 +18,23 @@ class TokenHelper {
   static Future<void> saveTokens(String access, String? refresh) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('accessToken', access);
-    if (refresh != null) {
-      await prefs.setString('refreshToken', refresh);
-    }
+    if (refresh != null) await prefs.setString('refreshToken', refresh);
   }
 
   static Future<String?> refreshAccessToken() async {
     final refreshToken = await getRefreshToken();
     if (refreshToken == null) return null;
-
     try {
-      final response = await http.post(
-        Uri.parse(refreshUrl),
+      final response = await http.post(Uri.parse(refreshUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'refreshToken': refreshToken}),
       );
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final newAccessToken = data['accessToken'];
-        final newRefreshToken = data['refreshToken'] ?? refreshToken;
-
-        await saveTokens(newAccessToken, newRefreshToken);
-        return newAccessToken;
+        final newAccess = data['accessToken'] ?? data['token'];
+        final newRefresh = data['refreshToken'] ?? refreshToken;
+        await saveTokens(newAccess, newRefresh);
+        return newAccess;
       }
     } catch (_) {}
     return null;

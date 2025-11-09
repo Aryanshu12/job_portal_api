@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../api/api_service.dart';
 import 'login_screen.dart';
 
@@ -20,17 +19,14 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
     setState(() => isLoading = true);
     try {
       final res = await ApiService.verifyOtp(widget.email, otpController.text.trim());
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        final msg = data['message'] ?? 'Verified';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      if (res.success) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message ?? 'Verified')));
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  LoginScreen()));
       } else {
-        final message = data['error'] ?? data['message'] ?? 'Verification failed';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.error ?? 'Verification failed')));
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: \$e')));
     } finally {
       setState(() => isLoading = false);
     }
@@ -39,11 +35,9 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
   Future<void> resend() async {
     try {
       final res = await ApiService.resendOtp(widget.email);
-      final data = jsonDecode(res.body);
-      final msg = data['message'] ?? data['error'] ?? 'OTP resent';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message ?? res.error ?? 'OTP resent')));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: \$e')));
     }
   }
 
@@ -56,7 +50,7 @@ class _VerifyOtpScreenState extends State<VerifyOtpScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Verification for ${widget.email}'),
+            Text('Verification for \${widget.email}'),
              SizedBox(height: 12),
             TextField(controller: otpController, decoration:  InputDecoration(labelText: 'Enter OTP')),
              SizedBox(height: 12),

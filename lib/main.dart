@@ -16,8 +16,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      title: 'Job Portal (Models)',
       debugShowCheckedModeBanner: false,
-      title: 'Job Portal',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: isLoggedIn ?  HomeScreen() :  LoginScreen(),
     );

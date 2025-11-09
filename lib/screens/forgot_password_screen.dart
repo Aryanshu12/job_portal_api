@@ -19,17 +19,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final email = emailController.text.trim();
     try {
       final res = await ApiService.forgotPassword(email);
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        final msg = data['message'] ?? 'OTP sent';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ResetPasswordScreen(email: email)));
-      } else {
-        final message = data['error'] ?? data['message'] ?? 'Failed';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message ?? res.error ?? 'OTP sent')));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => ResetPasswordScreen(email: email)));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: \$e')));
     } finally {
       setState(() => isLoading = false);
     }

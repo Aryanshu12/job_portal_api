@@ -30,17 +30,10 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
     setState(() => isLoading = true);
     try {
       final res = await ApiService.resetPassword(widget.email, otp, newPassword);
-      final data = jsonDecode(res.body);
-      if (res.statusCode == 200) {
-        final msg = data['message'] ?? 'Password reset successful';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  LoginScreen()));
-      } else {
-        final message = data['error'] ?? data['message'] ?? 'Failed';
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res.message ?? res.error ?? 'Password reset')));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) =>  LoginScreen()));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: \$e')));
     } finally {
       setState(() => isLoading = false);
     }
@@ -55,7 +48,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Reset password for ${widget.email}'),
+            Text('Reset password for \${widget.email}'),
              SizedBox(height: 12),
             TextField(controller: otpController, decoration:  InputDecoration(labelText: 'Enter OTP')),
              SizedBox(height: 12),
